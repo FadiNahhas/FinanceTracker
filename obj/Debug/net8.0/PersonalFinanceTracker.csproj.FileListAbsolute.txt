@@ -267,3 +267,4 @@ C:\Users\fadin\Desktop\Projects\PersonalFinanceTracker\obj\Debug\net8.0\refint\P
 C:\Users\fadin\Desktop\Projects\PersonalFinanceTracker\obj\Debug\net8.0\PersonalFinanceTracker.pdb
 C:\Users\fadin\Desktop\Projects\PersonalFinanceTracker\obj\Debug\net8.0\PersonalFinanceTracker.genruntimeconfig.cache
 C:\Users\fadin\Desktop\Projects\PersonalFinanceTracker\obj\Debug\net8.0\ref\PersonalFinanceTracker.dll
+C:\Users\fadin\Desktop\Projects\PersonalFinanceTracker\obj\Debug\net8.0\PersonalFinanceTracker.sourcelink.json
