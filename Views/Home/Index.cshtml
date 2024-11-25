@@ -2,7 +2,7 @@
     ViewData["Title"] = "Home Page";
     var isBudgetSet = ViewBag.IsBudgetSet as bool? ?? false;
     var budget = ViewBag.Budget as float?;
-    var transactions = ViewBag.Transactions as List<dynamic>;
+    var transactions = ViewBag.Transactions as List<Transaction>;
 }
 
 <div class="text-center">
@@ -28,12 +28,33 @@
 
             var budget = $('#budgetInput').val();
 
-            $.post('@Url.Action("SetBudget", "Home")', {budget: budget}, function (data) {
+            $.post('@Url.Action("SetBudget", "Home")', { budget: budget }, function (data) {
                 if (data.success) {
-                    $('#budgetModal').modal('hide');
-                    location.reload();
+                    $('#budgetModal').modal('hide'); // Hide the modal
+                    location.reload(); // Reload the page to show updated budget
                 } else {
                     alert('Failed to set budget. Please try again.');
+                }
+            }).fail(function () {
+                alert('An error occurred. Please try again.');
+            });
+        });
+
+        $('#transactionForm').on('submit', function (e) {
+            e.preventDefault();
+
+            var transaction = {
+                amount: $('#transactionAmount').val(),
+                description: $('#transactionDescription').val(),
+                date: $('#transactionDate').val()
+            };
+
+            $.post('@Url.Action("AddTransaction", "Home")', transaction, function (data) {
+                if (data.success) {
+                    $('#addTransactionModal').modal('hide'); // Hide the modal
+                    location.reload(); // Reload the page to fetch updated transactions
+                } else {
+                    alert('Failed to add transaction. Please try again.');
                 }
             }).fail(function () {
                 alert('An error occurred. Please try again.');
@@ -47,6 +68,7 @@
     <div class="text-center mt-4">
         <h2>Your Budget</h2>
         <h1 class="display-3 text-success">$@budget</h1>
+        <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addTransactionModal">Add Transaction</button>
     </div>
 }
 
@@ -95,6 +117,35 @@ else if (isBudgetSet)
                         <input type="number" id="budgetInput" name="budget" class="form-control" step="0.01" required/>
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Modal -->
+<div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTransactionModalLabel">Add Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="transactionForm">
+                    <div class="mb-3">
+                        <label for="transactionAmount" class="form-label">Amount</label>
+                        <input type="number" id="transactionAmount" name="amount" class="form-control" step="0.01" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="transactionDescription" class="form-label">Description</label>
+                        <input type="text" id="transactionDescription" name="description" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="transactionDate" class="form-label">Date</label>
+                        <input type="date" id="transactionDate" name="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Transaction</button>
                 </form>
             </div>
         </div>

@@ -26,12 +26,17 @@ public class HomeController : Controller
             return Redirect("/Identity/Account/Login");
         }
         
-        var transactions = user.Budget == null ? null : _context.Transactions.Where(t => t.UserId == user.Id).ToList();
+        var transactions = _context.Transactions
+            .Where(t => t.UserId == user.Id)
+            .ToList();
+
+        var transactionsTotal = transactions.Sum(t => t.Amount);
+        var budget = user.Budget + (float)transactionsTotal;
         
         ViewBag.IsBudgetSet = user.Budget != null;
-        ViewBag.Budget = user.Budget;
+        ViewBag.Budget = budget;
         ViewBag.Transactions = transactions;
-        
+
         return View();
     }
 
@@ -51,15 +56,44 @@ public class HomeController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
 
-        if (user != null)
+        if (user == null)
         {
-            user.Budget = budget;
-            await _userManager.UpdateAsync(user);
-
+            return Json(new { success = false, message = "User not logged in." });
+        }
+        
+        user.Budget = budget;
+        var result = await _userManager.UpdateAsync(user);
+        
+        if (result.Succeeded)
+        {
             return Json(new { success = true });
         }
+        
+        return Json(new { success = false, message = "Failed to update budget." });
+    }
 
-        return Json(new { success = false });
+    [HttpPost]
+    public async Task<IActionResult> AddTransaction(decimal amount, string description, DateTime date)
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+        {
+            return Json(new { success = false, message = "User not logged in." });
+        }
+        
+        var transaction = new Transaction
+        {
+            Amount = amount,
+            Description = description,
+            Date = date,
+            UserId = user.Id
+        };
+        
+        _context.Transactions.Add(transaction);
+        await _context.SaveChangesAsync();
+        
+        return Json(new { success = true });
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

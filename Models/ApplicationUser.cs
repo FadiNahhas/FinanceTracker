@@ -6,4 +6,7 @@ public class ApplicationUser : IdentityUser
 {
     public string Name { get; set; }
     public float? Budget { get; set; }
+    
+    public virtual ICollection<Transaction> Transactions { get; set; }
+
 }

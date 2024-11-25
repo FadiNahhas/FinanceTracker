@@ -11,4 +11,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.Entity<Transaction>()
+            .Property(t => t.Amount)
+            .HasPrecision(18, 2);
+        
+        builder.Entity<Transaction>()
+            .HasOne(t => t.User)
+            .WithMany(u => u.Transactions)
+            .HasForeignKey(t => t.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
 }
